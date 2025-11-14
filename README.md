@@ -47,9 +47,8 @@ La aplicación utiliza Laravel como framework principal en PHP y Firebase para e
 ## Tecnologías y herramientas
 
 - Backend: Laravel (PHP)  
-- Base de datos: Firebase Firestore  
+- Base de datos: Firebase Firestore
+- Framework: Firebase  
 - Autenticación: Firebase Authentication  
 - Frontend: HTML5, CSS3
-- IDE: Visual Studio Code  
 - Control de versiones: GitHub  
-- Dependencias: Composer
