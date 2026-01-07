@@ -1,52 +1,79 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <title>Registro de Personal</title>
+    <meta charset="UTF-8">
+    <title>Firebase Realtime Database Test</title>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // 🔹 CONFIGURACIÓN DE TU PROYECTO FIREBASE
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+            projectId: "TU_PROYECTO",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "XXXXXX",
+            appId: "XXXXXX"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Referencia a la base de datos
+        const usuariosRef = ref(database, 'usuarios');
+
+        // Guardar usuario
+        window.guardarUsuario = function () {
+            const nombre = document.getElementById("nombre").value;
+            const email = document.getElementById("email").value;
+
+            if (nombre === "" || email === "") {
+                alert("Completa todos los campos");
+                return;
+            }
+
+            push(usuariosRef, {
+                nombre: nombre,
+                email: email
+            });
+
+            document.getElementById("nombre").value = "";
+            document.getElementById("email").value = "";
+        };
+
+        // Leer usuarios en tiempo real
+        onValue(usuariosRef, (snapshot) => {
+            const lista = document.getElementById("listaUsuarios");
+            lista.innerHTML = "";
+
+            snapshot.forEach((childSnapshot) => {
+                const data = childSnapshot.val();
+                const li = document.createElement("li");
+                li.textContent = `${data.nombre} - ${data.email}`;
+                lista.appendChild(li);
+            });
+        });
+    </script>
 </head>
 <body>
 
-    <h1>Registrar Entrada</h1>
-    <form id="registro-form">
-        <input type="text" id="nombre" placeholder="Nombre" required>
-        <input type="text" id="hora-entrada" placeholder="Hora de Entrada" required>
-        <button type="submit">Registrar</button>
-    </form>
+<h1>Prueba Firebase Hosting + Realtime Database</h1>
 
-    <h1>Registros</h1>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Hora de Entrada</th>
-            </tr>
-        </thead>
-        <tbody id="registros-body"></tbody>
-    </table>
+<h2>Registrar usuario</h2>
 
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<input type="text" id="nombre" placeholder="Nombre">
+<input type="email" id="email" placeholder="Email">
+<button onclick="guardarUsuario()">Guardar</button>
 
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-         https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<hr>
 
-    <script>
-        // AÑADE AQUÍ LA CONFIGURACIÓN DE TU PROYECTO DE FIREBASE
-        var firebaseConfig = {
-            apiKey: "AIzaSyBx3vE3R_UscaSrvr-AhcgiaMbL5IyxAOQ",
-            authDomain: "repositorionubegit-50892-8a34b.firebaseapp.com",
-            databaseURL: "https://repositorionubegit-50892-8a34b-default-rtdb.firebaseio.com",
-            projectId: "repositorionubegit-50892-8a34b",
-            storageBucket: "repositorionubegit-50892-8a34b.firebasestorage.app",
-            messagingSenderId: "533014733514",
-            appId: "1:533014733514:web:fa7e2244b3f71643d48a33"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-    </script>
-
-    <script src="app.js"></script>
+<h2>Usuarios registrados</h2>
+<ul id="listaUsuarios"></ul>
 
 </body>
 </html>
