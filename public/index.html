@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="estilo.css">
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getDatabase,
+            ref,
+            push,
+            onValue,
+            update,
+            remove
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // 🔴 PEGA AQUÍ TU CONFIGURACIÓN REAL DE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBx3vE3R_UscaSrvr-AhcgiaMbL5IyxAOQ",
+            authDomain: "repositorionubegit-50892-8a34b.firebaseapp.com",
+            databaseURL: "https://repositorionubegit-50892-8a34b-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "repositorionubegit-50892-8a34b",
+            storageBucket: "repositorionubegit-50892-8a34b.firebasestorage.app",
+            messagingSenderId: "533014733514",
+            appId: "1:533014733514:web:fa7e2244b3f71643d48a33"
+        };
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const usuariosRef = ref(database, "usuarios");
+
+        // Guardar usuario
+        window.guardarUsuario = () => {
+            const nombre = document.getElementById("nombre").value.trim();
+            const email = document.getElementById("email").value.trim();
+
+            if (!nombre || !email) {
+                alert("Completa todos los campos");
+                return;
+            }
+
+            push(usuariosRef, { nombre, email });
+
+            document.getElementById("nombre").value = "";
+            document.getElementById("email").value = "";
+        };
+
+        // Mostrar usuarios
+        onValue(usuariosRef, (snapshot) => {
+            const lista = document.getElementById("listaUsuarios");
+            lista.innerHTML = "";
+
+            snapshot.forEach((child) => {
+                const id = child.key;
+                const data = child.val();
+
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div>
+                        <strong>${data.nombre}</strong>
+                        <span>${data.email}</span>
+                    </div>
+                    <div class="acciones">
+                        <button onclick="editarUsuario('${id}')">✏️</button>
+                        <button onclick="eliminarUsuario('${id}')">🗑</button>
+                    </div>
+                `;
+                lista.appendChild(li);
+            });
+        });
+
+        // Editar usuario
+        window.editarUsuario = (id) => {
+            const nombre = prompt("Nuevo nombre:");
+            const email = prompt("Nuevo email:");
+
+            if (!nombre || !email) return;
+
+            update(ref(database, `usuarios/${id}`), {
+                nombre,
+                email
+            });
+        };
+
+        // Eliminar usuario
+        window.eliminarUsuario = (id) => {
+            if (confirm("¿Eliminar usuario?")) {
+                remove(ref(database, `usuarios/${id}`));
+            }
+        };
+    </script>
+</head>
+
+<body>
+
+<header>
+    <h1>Gestión de Usuarios</h1>
+    <p>Firebase Realtime Database</p>
+</header>
+
+<main>
+    <section class="formulario">
+        <h2>Nuevo Usuario</h2>
+        <input type="text" id="nombre" placeholder="Nombre">
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <button onclick="guardarUsuario()">Guardar</button>
+    </section>
+
+    <section class="listado">
+        <h2>Usuarios Registrados</h2>
+        <ul id="listaUsuarios"></ul>
+    </section>
+</main>
+
+<footer>
+    <p>Proyecto académico · Firebase Hosting</p>
+</footer>
+
+</body>
+</html>
